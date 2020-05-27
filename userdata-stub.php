@@ -9,12 +9,12 @@ class EndomondoUserCredentials {
     public function GetUsername() {
       $_UserNameCount++;
       if ($_UserNameCount > 1) { die("invalid call"); }
-      return "#USERNAME#";
+      return '#USERNAME#';
     }
 
     public function GetPassword() {
       $_PasswordCount++;
       if ($_PasswordCount > 1) { die("invalid call"); }      
-      return "#PASSWORD#";
+      return '#PASSWORD#';
     }
   }
