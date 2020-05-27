@@ -153,6 +153,7 @@ class S4U_Endomondo_Challenges_Admin {
 
         $workoutValues = get_option('s4u_endomondo_challenge_workouts');
         $pushed = false;
+        $modifiedWorkoutObject = [];
         $workoutObject = ($workoutValues !== false ? json_decode(get_option('s4u_endomondo_challenge_workouts')) : []);
 
         $workouts = json_decode($response['body']);
@@ -166,11 +167,14 @@ class S4U_Endomondo_Challenges_Admin {
             }
 
             if ($exists == false) {
-                array_push($workoutObject, $workouts->data[$k]);
+                array_push($modifiedWorkoutObject, $workouts->data[$k]);
             }
         }
+        for ($k=0; $k < count($workouts->data); $k++) {
+            array_push($modifiedWorkoutObject, $workouts->data[$k]);            
+        }
 
-        update_option('s4u_endomondo_challenge_workouts', json_encode($workoutObject));
+        update_option('s4u_endomondo_challenge_workouts', json_encode($modifiedWorkoutObject));
        
     }
 
