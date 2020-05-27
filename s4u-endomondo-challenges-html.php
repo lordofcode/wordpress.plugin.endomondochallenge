@@ -366,6 +366,7 @@ if ($workouts != false) {
 					$userJoined = (intval($challengesObject[$k]->viewer_joined) == 1);
 				}
 				if ($userJoined) {
+					$item = "<div class=\"widget\"><h5 class=\"widget-title\">".$challengesObject[$k]->name."</h5>";
 					if (isset($challengesObject[$k]->picture)) {
 						$picture = $challengesObject[$k]->picture;
 						if (isset($picture->url)) {
