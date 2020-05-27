@@ -64,7 +64,10 @@ class S4U_Endomondo_Challenges_Html {
 <?php
 		if ($hasAProfile) :
 			$challengesJson = get_option('s4u_endomondo_challenges');
-			if ($challengesJson == '') {
+			if ($challengesJson == false) {
+				$challengesJson = '[]';				
+			}
+			if ($challengesJson == '[]') {
 				$challengesObject = [];
 				// 11-steden-walks 2020
 				$defaultItems = [43129667,43160669,43164778,43164846,43166019,43166057,43165966,43166079,43166158,43166107,43165993,43164820,43164850,43164848,43165943,43166123];
@@ -146,9 +149,9 @@ if ($status == "Doet mee") {
 	$minute = "00";
 
 	if ($challengesStartDateObject != null) {
-		for ($k=0; $k < count($challengesStartDateObject); $k++) {
-			if ($challengesStartDateObject[$k]->id == $challengesObject[$k]->id) {
-				$parts = explode(' ', $challengesStartDateObject[$k]->date);
+		for ($z=0; $z < count($challengesStartDateObject); $z++) {
+			if ($challengesStartDateObject[$z]->id == $challengesObject[$k]->id) {
+				$parts = explode(' ', $challengesStartDateObject[$z]->date);
 				$dmy = explode('-', $parts[0]);
 				$day = $dmy[2];
 				$month = $dmy[1];
@@ -164,9 +167,9 @@ if ($status == "Doet mee") {
 <input type="hidden" name="admin_action" value="endomondo_savechallengestartdate" />
 <input type="hidden" name="challenge_id" value="<?php echo $challengesObject[$k]->id;?>" />
 <select name="day">
-<?php for ($k=1; $k < 32; $k++) {
-	$selected = ($day == $k ? "selected=\"selected\"" : "");
-?><option <?php echo $selected;?> value="<?php echo $k;?>"><?php echo $k;?></option><?php
+<?php for ($a=1; $a < 32; $a++) {
+	$selected = ($day == $a ? "selected=\"selected\"" : "");
+?><option <?php echo $selected;?> value="<?php echo $a;?>"><?php echo $a;?></option><?php
 }?>
 </select>&nbsp;
 <?php echo $this->GetMonthDropDown($month);?>
@@ -174,21 +177,21 @@ if ($status == "Doet mee") {
 <select name="year">
 <?php 
 $tillValue = date('Y') - 10;
-for ($k=date('Y'); $k > $tillValue; $k--) {
-	$selected = ($year == $k ? "selected=\"selected\"" : "");
-?><option <?php echo $selected;?> value="<?php echo $k;?>"><?php echo $k;?></option><?php
+for ($a=date('Y'); $a > $tillValue; $a--) {
+	$selected = ($year == $a ? "selected=\"selected\"" : "");
+?><option <?php echo $selected;?> value="<?php echo $a;?>"><?php echo $a;?></option><?php
 }?>
 </select><br/><br/>
 <select name="hour">
-<?php for ($k=0; $k < 24; $k++) {
-	$z = ($k < 10 ? "0".$k : $k);
+<?php for ($a=0; $a < 24; $a++) {
+	$z = ($a < 10 ? "0".$a : $a);
 	$selected = ($hour == $z ? "selected=\"selected\"" : "");
 ?><option <?php echo $selected;?> value="<?php echo $z;?>"><?php echo $z;?></option><?php
 }?>
 </select>&nbsp;:&nbsp;
 <select name="minute">
-<?php for ($k=0; $k < 60; $k++) {
-	$z = ($k < 10 ? "0".$k : $k);
+<?php for ($a=0; $a < 60; $a++) {
+	$z = ($a < 10 ? "0".$a : $a);
 	$selected = ($minute == $z ? "selected=\"selected\"" : "");
 ?><option <?php echo $selected;?> value="<?php echo $z;?>"><?php echo $z;?></option><?php
 }?>
@@ -363,7 +366,6 @@ if ($workouts != false) {
 					$userJoined = (intval($challengesObject[$k]->viewer_joined) == 1);
 				}
 				if ($userJoined) {
-					$item = "<div class=\"widget\"><h5>".$challengesObject[$k]->name."</h5>";
 					if (isset($challengesObject[$k]->picture)) {
 						$picture = $challengesObject[$k]->picture;
 						if (isset($picture->url)) {
