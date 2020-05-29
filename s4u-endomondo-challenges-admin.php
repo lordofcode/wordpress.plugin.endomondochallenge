@@ -155,28 +155,45 @@ class S4U_Endomondo_Challenges_Admin {
         $pushed = false;
         $modifiedWorkoutObject = [];
         $workoutObject = ($workoutValues !== false ? json_decode(get_option('s4u_endomondo_challenge_workouts')) : []);
-
+        $modifiedWorkoutObject = $this->BuildDistinctWorkoutArray($modifiedWorkoutObject, $workoutObject);
         $workouts = json_decode($response['body']);
-        for ($k=0; $k < count($workouts->data); $k++) {
-            $exists = false;
-
-            for ($z=0; $z < count($workoutObject); $z++) {
-                if ($workoutObject[$z]->id == $workouts->data[$k]->id) {
-                    $exists = true;
-                }
-            }
-
-            if ($exists == false) {
-                array_push($modifiedWorkoutObject, $workouts->data[$k]);
-            }
-        }
-        for ($k=0; $k < count($workouts->data); $k++) {
-            array_push($modifiedWorkoutObject, $workouts->data[$k]);            
-        }
-
+        $modifiedWorkoutObject = $this->BuildDistinctWorkoutArray($modifiedWorkoutObject, $workouts->data);
         update_option('s4u_endomondo_challenge_workouts', json_encode($modifiedWorkoutObject));
        
     }
+
+    private function BuildDistinctWorkoutArray($initialArray, $dataArray) {
+        if (is_array($initialArray) && is_array($dataArray)) {
+            $resultArray  = [];
+            for ($a=0; $a < count($dataArray); $a++) {
+                $exists = false;            
+                for ($b=0; $b < count($initialArray); $b++) {
+                    if ($dataArray[$a]->id == $initialArray[$b]->id) {
+                        $exists = true;
+                        break;
+                    }
+                }
+                if ($exists == false) {
+                    array_push($resultArray, $dataArray[$a]);
+                }           
+            }
+            for ($a=0; $a < count($initialArray); $a++) {
+                $exists = false;            
+                for ($b=0; $b < count($resultArray); $b++) {
+                    if ($resultArray[$a]->id == $initialArray[$b]->id) {
+                        $exists = true;
+                        break;
+                    }
+                }
+                if ($exists == false) {
+                    array_push($resultArray, $initialArray[$a]);
+                }           
+            }        
+            return $resultArray;
+        }
+        return $initialArray;
+    }
+
 
     private function FetchChallengeData($firstCall, $ChallengeId) {
         if (intval($ChallengeId) <= 0) return false;
