@@ -271,9 +271,9 @@ if ($workouts != false) {
 	private function GetMonthDropDown($month) {
 		$result = "<select name=\"month\">";
 		$months = ["januari","februari","maart","april","mei","juni","juli","augustus","september","oktober","november","december"];
-		for ($k=1; $k < 13; $k++) {
-			$selected = ($month == $k ? "selected=\"selected\"" : "");
-			$result .= "<option ".$selected." value=\"".$k."\">".$months[$k-1]."</option>";
+		for ($a=1; $a < 13; $a++) {
+			$selected = ($month == $a ? "selected=\"selected\"" : "");
+			$result .= "<option ".$selected." value=\"".$a."\">".$months[$a-1]."</option>";
 		}
 		$result .= "</select>";
 		return $result;
