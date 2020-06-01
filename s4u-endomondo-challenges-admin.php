@@ -9,68 +9,74 @@ class S4U_Endomondo_Challenges_Admin {
     }
 
     public function ProcessPost() {
-        switch($_POST['admin_action']) {
-            case 'endomondo_login':
-                $stubLocation = str_replace("s4u-endomondo-challenges-admin.php", "userdata-stub.php", __FILE__);
-                $saveLocation = str_replace("s4u-endomondo-challenges-admin.php", "userdata.php", __FILE__);
+        try {        
+            switch($_POST['admin_action']) {
+                case 'endomondo_login':
+                    $stubLocation = str_replace("s4u-endomondo-challenges-admin.php", "userdata-stub.php", __FILE__);
+                    $saveLocation = str_replace("s4u-endomondo-challenges-admin.php", "userdata.php", __FILE__);
 
-                $un = $_POST['endomondo_un'];
-                $pw = $_POST['endomondo_pw'];
-                if ($un != '' && $pw != '') {
-                    $stubFile = file_get_contents($stubLocation);
-                    $stubFile = str_replace("#USERNAME#", $_POST['endomondo_un'], $stubFile);
-                    $stubFile = str_replace("#PASSWORD#", $_POST['endomondo_pw'], $stubFile);
-                    file_put_contents($saveLocation, $stubFile);
-                }
-                $this->Login();
-            break;
-            case 'endomondo_clean':
-                $this->CleanData();
-            break;
-            case 'endomondo_fetchchallengedata':
-                $result = $this->FetchChallengeData(true, $_POST['challenge_id']);
-                if ($result !== false) {
-                    $modifiedChallengesObject = [];
-                    $challengesObject = json_decode(get_option('s4u_endomondo_challenges'));
-                    for ($k=0; $k < count($challengesObject); $k++) {
-                        if ($challengesObject[$k]->id == $result->id) {
-                            array_push($modifiedChallengesObject, $result);
+                    $un = $_POST['endomondo_un'];
+                    $pw = $_POST['endomondo_pw'];
+                    if ($un != '' && $pw != '') {
+                        $stubFile = file_get_contents($stubLocation);
+                        $stubFile = str_replace("#USERNAME#", $_POST['endomondo_un'], $stubFile);
+                        $stubFile = str_replace("#PASSWORD#", $_POST['endomondo_pw'], $stubFile);
+                        file_put_contents($saveLocation, $stubFile);
+                    }
+                    $this->Login();
+                break;
+                case 'endomondo_clean':
+                    $this->CleanData();
+                break;
+                case 'endomondo_fetchchallengedata':
+                    $result = $this->FetchChallengeData(true, $_POST['challenge_id']);
+                    if ($result !== false) {
+                        $modifiedChallengesObject = [];
+                        $challengesObject = json_decode(get_option('s4u_endomondo_challenges'));
+                        for ($k=0; $k < count($challengesObject); $k++) {
+                            if ($challengesObject[$k]->id == $result->id) {
+                                array_push($modifiedChallengesObject, $result);
+                            }
+                            else{
+                                array_push($modifiedChallengesObject, $challengesObject[$k]);
+                            }
                         }
-                        else{
+                        update_option('s4u_endomondo_challenges', json_encode($modifiedChallengesObject));
+                    }
+                break;
+                case 'endomondo_removesinglechallenge':
+                    $toRemove = intval($_POST['challenge_id']);
+                    if ($toRemove <= 0) return;
+                    if ($result !== false) {
+                        $modifiedChallengesObject = [];
+                        $challengesObject = json_decode(get_option('s4u_endomondo_challenges'));
+                        for ($k=0; $k < count($challengesObject); $k++) {
+                            if ($challengesObject[$k]->id == $toRemove) {
+                                continue;
+                            }
                             array_push($modifiedChallengesObject, $challengesObject[$k]);
                         }
-                    }
-                    update_option('s4u_endomondo_challenges', json_encode($modifiedChallengesObject));
-                }
-            break;
-            case 'endomondo_removesinglechallenge':
-                $toRemove = intval($_POST['challenge_id']);
-                if ($toRemove <= 0) return;
-                if ($result !== false) {
-                    $modifiedChallengesObject = [];
-                    $challengesObject = json_decode(get_option('s4u_endomondo_challenges'));
-                    for ($k=0; $k < count($challengesObject); $k++) {
-                        if ($challengesObject[$k]->id == $toRemove) {
-                            continue;
-                        }
-                        array_push($modifiedChallengesObject, $challengesObject[$k]);
-                    }
-                    update_option('s4u_endomondo_challenges', json_encode($modifiedChallengesObject));
-                }                
-            break;
-            case 'endomondo_fetchworkouts':
-                $this->FetchWorkouts(true);
-            break;
-            case 'endomondo_fetchchallenges':
-                $this->FetchChallenges(true);
-            break;
-            case 'endomondo_savechallengestartdate':
-                $this->SaveChallengeStartDate($_POST['challenge_id']);
-            break;
-            case 'endomondo_updatemydistancebyworkouts':
-                $this->UpdateMyDistances();
-            break;
-        }        
+                        update_option('s4u_endomondo_challenges', json_encode($modifiedChallengesObject));
+                    }                
+                break;
+                case 'endomondo_fetchworkouts':
+                    $this->FetchWorkouts(true);
+                break;
+                case 'endomondo_fetchchallenges':
+                    $this->FetchChallenges(true);
+                break;
+                case 'endomondo_savechallengestartdate':
+                    $this->SaveChallengeStartDate($_POST['challenge_id']);
+                break;
+                case 'endomondo_updatemydistancebyworkouts':
+                    $this->UpdateMyDistances();
+                break;
+            }
+        }
+        catch(exception $e) {
+            $_ErrorMessage = "Fout opgetreden: " . $e;
+        }
+
     }
 
     private function Login() {
@@ -180,7 +186,7 @@ class S4U_Endomondo_Challenges_Admin {
             for ($a=0; $a < count($initialArray); $a++) {
                 $exists = false;            
                 for ($b=0; $b < count($resultArray); $b++) {
-                    if ($resultArray[$a]->id == $initialArray[$b]->id) {
+                    if ($initialArray[$a]->id == $resultArray[$b]->id) {
                         $exists = true;
                         break;
                     }
