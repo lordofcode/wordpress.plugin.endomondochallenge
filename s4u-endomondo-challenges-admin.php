@@ -8,9 +8,9 @@ class S4U_Endomondo_Challenges_Admin {
         return $_ErrorMessage;
     }
 
-    public function ProcessPost() {
+    public function ProcessPost($postAction) {
         try {        
-            switch($_POST['admin_action']) {
+            switch($postAction) {
                 case 'endomondo_login':
                     $stubLocation = str_replace("s4u-endomondo-challenges-admin.php", "userdata-stub.php", __FILE__);
                     $saveLocation = str_replace("s4u-endomondo-challenges-admin.php", "userdata.php", __FILE__);
@@ -62,14 +62,37 @@ class S4U_Endomondo_Challenges_Admin {
                 case 'endomondo_fetchworkouts':
                     $this->FetchWorkouts(true);
                 break;
-                case 'endomondo_fetchchallenges':
-                    $this->FetchChallenges(true);
-                break;
                 case 'endomondo_savechallengestartdate':
                     $this->SaveChallengeStartDate($_POST['challenge_id']);
                 break;
                 case 'endomondo_updatemydistancebyworkouts':
                     $this->UpdateMyDistances();
+                break;
+                case 'crontask':
+                    $doFetch = true;
+                    $cronLastFetch = intval(get_option('s4u_endomondo_cron_fetchchworkouts'));
+                    if ($cronLastFetch != 0) {
+                        $margin = mktime() - $cronLastFetch;
+                        if ($margin < 3600) {
+                            $doFetch = false;
+                        }
+                    }
+                    if ($doFetch) {
+                        update_option('s4u_endomondo_cron_fetchchworkouts', mktime());
+                        $this->FetchWorkouts(true);
+                    }
+                    $doFetch = true;
+                    $cronLastUpdate = intval(get_option('s4u_endomondo_cron_lastupdate'));
+                    if ($cronLastUpdate != 0) {
+                        $margin = mktime() - $cronLastUpdate;
+                        if ($margin < 3600) {
+                            $doFetch = false;
+                        }
+                    }
+                    if ($doFetch) {
+                        update_option('s4u_endomondo_cron_lastupdate', mktime());
+                        $this->UpdateMyDistances();
+                    }
                 break;
             }
         }

@@ -17,7 +17,16 @@ if (is_admin()) {
     require('s4u-endomondo-challenges-admin.php');
     if (isset($_POST['admin_action'])) {
         $adminHandler = new S4U_Endomondo_Challenges_Admin();
-        $adminHandler->ProcessPost();
+        $adminHandler->ProcessPost($_POST['admin_action']);
+    }
+}
+else {
+    if (isset($_GET['cron']) && ($_GET['cron']=='update-endomondo')) {
+        require('s4u-endomondo-challenges-admin.php');
+        $adminHandler = new S4U_Endomondo_Challenges_Admin();
+        $adminHandler->ProcessPost('crontask');
+        echo "OK!";
+        exit;
     }
 }
 
